@@ -54,6 +54,7 @@ const connectionStatus = document.getElementById("connectionStatus");
 const gameStatus = document.getElementById("gameStatus");
 const restartBtn = document.getElementById("restart");
 const playAgainBtn = document.getElementById("play-again");
+const homeBtn = document.getElementById("homeBtn");
 
 const countdownDisplay = document.getElementById("countdown");
 const musicToggleButton = document.getElementById("musicToggle");
@@ -1458,6 +1459,9 @@ function showMultiplayerUnavailable() {
     clearTimeout(multiplayerConnectionTimer);
     multiplayerConnectionTimer = null;
   }
+  if (homeBtn) {
+    homeBtn.hidden = true;
+  }
 
   document.body.classList.remove("multiplayer-lobby", "practice-mode");
   if (startScreen) {
@@ -1480,6 +1484,9 @@ function enterMultiplayerLobby() {
 
   if (startScreen) {
     startScreen.style.display = "none";
+  }
+  if (homeBtn) {
+    homeBtn.hidden = false;
   }
   document.body.classList.remove("practice-mode");
   document.body.classList.add("multiplayer-lobby");
@@ -1706,7 +1713,12 @@ document.body.classList.remove("multiplayer-lobby");
       resetMultiplayerState();
       requestPublicRooms();
 
-      if (gameStatus) {
+      if (startScreen && startScreen.style.display !== "none") {
+        document.body.classList.remove("multiplayer-lobby");
+        if (gameStatus) {
+          gameStatus.textContent = "Choose a game mode to begin.";
+        }
+      } else if (gameStatus) {
         gameStatus.textContent = "You left the room.";
       }
 
@@ -2035,6 +2047,9 @@ if (startPracticeBtn) {
     if (startScreen) {
       startScreen.style.display = "none";
     }
+    if (homeBtn) {
+      homeBtn.hidden = false;
+    }
 
     document.body.classList.add("practice-mode");
 
@@ -2046,6 +2061,42 @@ if (startPracticeBtn) {
     resetGame();
     startBackgroundMusic();
   });
+}
+
+function returnToHome() {
+  multiplayerRequested = false;
+  if (multiplayerConnectionTimer) {
+    clearTimeout(multiplayerConnectionTimer);
+    multiplayerConnectionTimer = null;
+  }
+  if (currentRoomCode) {
+    sendToServer({ type: "leave_room" });
+  }
+  if (practiceTimer) {
+    clearInterval(practiceTimer);
+    practiceTimer = null;
+  }
+
+  resetMultiplayerState();
+  practiceMode = false;
+  document.body.classList.remove("multiplayer-lobby", "practice-mode");
+  if (startScreen) {
+    startScreen.style.display = "";
+  }
+  if (homeBtn) {
+    homeBtn.hidden = true;
+  }
+  if (startFootnote) {
+    startFootnote.textContent = defaultStartFootnoteText;
+  }
+  if (gameStatus) {
+    gameStatus.textContent = "Choose a game mode to begin.";
+  }
+  hideMessage();
+}
+
+if (homeBtn) {
+  homeBtn.addEventListener("click", returnToHome);
 }
 
 if (startMultiplayerBtn) {

@@ -502,7 +502,6 @@ if (data.type === "player_move") {
   return;
 }
   if (room.game.gameOver) {
-  broadcast(room, { type: "game_state", game: room.game });
   return;
 }
 
@@ -559,7 +558,9 @@ for (let i = room.game.coins.length - 1; i >= 0; i--) {
   }
 }
 
-broadcast(room, { type: "game_state", game: room.game });
+if (room.game.gameOver) {
+  broadcast(room, { type: "game_state", game: room.game });
+}
 return;
 }
     if (data.type === "ping") {
@@ -631,7 +632,7 @@ setInterval(() => {
       game: room.game
     });
   }
-}, 33);
+}, 50);
 
 function finishLevel(room, winner) {
   if (room.game.gameOver) return;
