@@ -5,7 +5,7 @@
 
 "use strict";
 
-const MULTIPLAYER_SERVER_URL = "";
+const MULTIPLAYER_SERVER_URL = "wss://duo-arena-gb6e.onrender.com";
 
 // ---------------------------------------------------------
 // 1. HTML ELEMENTS
@@ -1365,7 +1365,10 @@ function connectToServer() {
     return true;
   }
 
-  let serverUrl = MULTIPLAYER_SERVER_URL.trim();
+  const isSelfHosted = location.hostname === "localhost" ||
+    location.hostname === "onrender.com" ||
+    location.hostname.endsWith(".onrender.com");
+  let serverUrl = isSelfHosted ? "" : MULTIPLAYER_SERVER_URL.trim();
   if (!serverUrl) {
     if (location.protocol === "file:" || !location.host) {
       return false;
