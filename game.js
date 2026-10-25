@@ -139,6 +139,15 @@ let myPlayerNumber = null;
 let currentRoomCode = null;
 let multiplayerReady = false;
 let multiplayerGameState = null;
+let multiplayerStateInitialized = false;
+let lastMultiplayerStateLevel = null;
+let lastMultiplayerStatePhase = null;
+let lastMultiplayerStartedAt = null;
+let multiplayerOpponentTarget = null;
+let lastMultiplayerOpponentMovementSequence = null;
+let lastMultiplayerMovementSentAt = 0;
+let lastMultiplayerSentPosition = null;
+let lastMultiplayerMovementSequence = 0;
 
 let musicEnabled = true;
 let audioContext = null;
@@ -1138,8 +1147,8 @@ function resetGame(level = currentLevel) {
 // 17. PRACTICE MOVEMENT
 // ---------------------------------------------------------
 
-function movePracticePlayer() {
-  if (!gameRunning || gameOver || !practiceMode) return;
+function movePlayer() {
+  if (!gameRunning || gameOver) return;
 
   let dx = 0;
   let dy = 0;
@@ -1579,6 +1588,7 @@ function resetMultiplayerState() {
   myPlayerNumber = null;
   multiplayerReady = false;
   multiplayerGameState = null;
+  resetMultiplayerSynchronization();
   gameRunning = false;
   gameOver = false;
   currentLevel = 1;
@@ -1600,6 +1610,18 @@ function resetMultiplayerState() {
 
   document.body.classList.add("multiplayer-lobby");
   updateRoomDisplay();
+}
+
+function resetMultiplayerSynchronization() {
+  multiplayerStateInitialized = false;
+  lastMultiplayerStateLevel = null;
+  lastMultiplayerStatePhase = null;
+  lastMultiplayerStartedAt = null;
+  multiplayerOpponentTarget = null;
+  lastMultiplayerOpponentMovementSequence = null;
+  lastMultiplayerMovementSentAt = 0;
+  lastMultiplayerSentPosition = null;
+  lastMultiplayerMovementSequence = 0;
 }
 
 // ---------------------------------------------------------
@@ -1627,6 +1649,7 @@ function handleServerMessage(message) {
     case "room_created": {
       currentRoomCode = message.roomCode || message.code;
       myPlayerNumber = 1;
+      resetMultiplayerSynchronization();
       currentLevel = 1;
       updateLevelDisplay();
 document.body.classList.remove("multiplayer-lobby");
@@ -1650,6 +1673,7 @@ document.body.classList.remove("multiplayer-lobby");
     case "room_joined": {
       currentRoomCode = message.roomCode || message.code;
       myPlayerNumber = message.playerNumber || message.player;
+      resetMultiplayerSynchronization();
       currentLevel = 1;
       updateLevelDisplay();
 document.body.classList.remove("multiplayer-lobby");
@@ -1793,6 +1817,11 @@ function updateMultiplayerGame(game) {
   if (!game) return;
 
   const players = game.players || {};
+  const phase = `${Boolean(game.started)}:${Boolean(game.gameOver)}:${Boolean(game.matchOver)}`;
+  const levelChanged = multiplayerStateInitialized && game.level !== lastMultiplayerStateLevel;
+  const phaseChanged = multiplayerStateInitialized && phase !== lastMultiplayerStatePhase;
+  const roundStarted = Boolean(game.started) &&
+    (!lastMultiplayerStartedAt || game.startedAt !== lastMultiplayerStartedAt);
 
   if (Number.isFinite(game.level)) {
     currentLevel = Math.max(1, game.level);
@@ -1809,19 +1838,49 @@ function updateMultiplayerGame(game) {
   const otherPlayer = players[opponentNumber];
 
   if (ownPlayer) {
-    player.x = ownPlayer.x;
-    player.y = ownPlayer.y;
+    const distance = Math.hypot(player.x - ownPlayer.x, player.y - ownPlayer.y);
+    const hasUnacknowledgedMovement =
+      Number.isFinite(ownPlayer.movementSequence) &&
+      ownPlayer.movementSequence < lastMultiplayerMovementSequence;
+    if (
+      !multiplayerStateInitialized ||
+      levelChanged ||
+      phaseChanged ||
+      roundStarted ||
+      (distance > 80 && !hasUnacknowledgedMovement)
+    ) {
+      player.x = ownPlayer.x;
+      player.y = ownPlayer.y;
+    }
 
     if (typeof ownPlayer.score === "number") {
       score = ownPlayer.score;
     }
   }
 
-if (otherPlayer) {
-  opponent.x = otherPlayer.x;
-  opponent.y = otherPlayer.y;
-  opponent.score = otherPlayer.score || 0;
-}
+  if (levelChanged || phaseChanged || roundStarted) {
+    lastMultiplayerOpponentMovementSequence = null;
+  }
+
+  if (
+    otherPlayer &&
+    (
+      !Number.isFinite(otherPlayer.movementSequence) ||
+      lastMultiplayerOpponentMovementSequence === null ||
+      otherPlayer.movementSequence >= lastMultiplayerOpponentMovementSequence
+    )
+  ) {
+    multiplayerOpponentTarget = { x: otherPlayer.x, y: otherPlayer.y };
+    if (Number.isFinite(otherPlayer.movementSequence)) {
+      lastMultiplayerOpponentMovementSequence = otherPlayer.movementSequence;
+    }
+    opponent.score = otherPlayer.score || 0;
+  }
+
+  multiplayerStateInitialized = true;
+  lastMultiplayerStateLevel = game.level;
+  lastMultiplayerStatePhase = phase;
+  lastMultiplayerStartedAt = game.startedAt;
 
 if (opponentScoreDisplay) {
   opponentScoreDisplay.textContent =
@@ -1934,40 +1993,43 @@ function sendMultiplayerMovement() {
     return;
   }
 
-  let dx = 0;
-  let dy = 0;
-
-  if (keys.ArrowLeft || keys.a || keys.A) dx--;
-  if (keys.ArrowRight || keys.d || keys.D) dx++;
-  if (keys.ArrowUp || keys.w || keys.W) dy--;
-  if (keys.ArrowDown || keys.s || keys.S) dy++;
-
-  if (dx === 0 && dy === 0) return;
-
-  const length = Math.hypot(dx, dy) || 1;
-
-  const nextX = clamp(
-    player.x + (dx / length) * player.speed,
-    player.radius,
-    canvas.width - player.radius
-  );
-
-  const nextY = clamp(
-    player.y + (dy / length) * player.speed,
-    player.radius,
-    canvas.height - player.radius
-  );
-
-  player.x = nextX;
-  player.y = nextY;
-
-sendToServer({
-  type: "player_move",
-  position: {
-    x: player.x,
-    y: player.y
+  if (
+    lastMultiplayerSentPosition &&
+    player.x === lastMultiplayerSentPosition.x &&
+    player.y === lastMultiplayerSentPosition.y
+  ) {
+    return;
   }
-});
+
+  const now = performance.now();
+  if (now - lastMultiplayerMovementSentAt < 50) return;
+
+  lastMultiplayerMovementSentAt = now;
+  lastMultiplayerSentPosition = { x: player.x, y: player.y };
+  const sequence = ++lastMultiplayerMovementSequence;
+  sendToServer({
+    type: "player_move",
+    sequence,
+    position: {
+      x: player.x,
+      y: player.y
+    }
+  });
+}
+
+function updateMultiplayerOpponent() {
+  if (!multiplayerOpponentTarget) return;
+
+  const dx = multiplayerOpponentTarget.x - opponent.x;
+  const dy = multiplayerOpponentTarget.y - opponent.y;
+  if (Math.hypot(dx, dy) > 150) {
+    opponent.x = multiplayerOpponentTarget.x;
+    opponent.y = multiplayerOpponentTarget.y;
+    return;
+  }
+
+  opponent.x += dx * 0.3;
+  opponent.y += dy * 0.3;
 }
 
 // ---------------------------------------------------------
@@ -2184,13 +2246,16 @@ function gameLoop() {
   drawGrassDetails();
 
   if (practiceMode && gameRunning && !gameOver) {
-    movePracticePlayer();
+    movePlayer();
     collectPracticeCoins();
   }
 
-  if (!practiceMode && gameRunning && !gameOver) {
+  if (!practiceMode && currentRoomCode && gameRunning && !gameOver) {
+    movePlayer();
     sendMultiplayerMovement();
   }
+
+  updateMultiplayerOpponent();
 
   if (practiceMode) {
     updateObstacles();

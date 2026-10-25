@@ -138,6 +138,48 @@ function serverCircleTouchesObstacle(x, y, radius, obstacle) {
   ) < radius;
 }
 
+function pushPlayerOut(player, obstacles, radius = 15) {
+  for (let attempt = 0; attempt < obstacles.length * 2; attempt++) {
+    let pushed = false;
+
+    for (const obstacle of obstacles) {
+      if (!serverCircleTouchesObstacle(player.x, player.y, radius, obstacle)) {
+        continue;
+      }
+
+      const closestX = Math.max(obstacle.x, Math.min(player.x, obstacle.x + obstacle.width));
+      const closestY = Math.max(obstacle.y, Math.min(player.y, obstacle.y + obstacle.height));
+      const dx = player.x - closestX;
+      const dy = player.y - closestY;
+      const distance = Math.hypot(dx, dy);
+
+      if (distance >= radius) continue;
+
+      if (distance > 0) {
+        const pushDistance = radius - distance + 0.01;
+        player.x += (dx / distance) * pushDistance;
+        player.y += (dy / distance) * pushDistance;
+      } else {
+        const exits = [
+          { distance: player.x - obstacle.x, x: obstacle.x - radius - 0.01, y: player.y },
+          { distance: obstacle.x + obstacle.width - player.x, x: obstacle.x + obstacle.width + radius + 0.01, y: player.y },
+          { distance: player.y - obstacle.y, x: player.x, y: obstacle.y - radius - 0.01 },
+          { distance: obstacle.y + obstacle.height - player.y, x: player.x, y: obstacle.y + obstacle.height + radius + 0.01 }
+        ];
+        exits.sort((a, b) => a.distance - b.distance);
+        player.x = exits[0].x;
+        player.y = exits[0].y;
+      }
+
+      player.x = Math.max(radius, Math.min(800 - radius, player.x));
+      player.y = Math.max(radius, Math.min(500 - radius, player.y));
+      pushed = true;
+    }
+
+    if (!pushed) break;
+  }
+}
+
 function updateRoom(room) {
   broadcast(room, {
     type: "room_update",
@@ -253,6 +295,12 @@ function leaveRoom(socket) {
     room.game.matchOver = false;
     room.game.startedAt = null;
     room.game.timeRemaining = room.game.duration;
+    room.game.players[1].x = 100;
+    room.game.players[1].y = 200;
+    room.game.players[1].movementSequence = 0;
+    room.game.players[2].x = 450;
+    room.game.players[2].y = 250;
+    room.game.players[2].movementSequence = 0;
     room.game.players[1].score = 0;
     room.game.players[2].score = 0;
     room.game.obstacles = createLevelObstacles(room.game.level);
@@ -323,8 +371,8 @@ wss.on("connection", socket => {
           startedAt: null,
           targetScore: 10,
           players: {
-            1: { x: 100, y: 200, score: 0, levelsWon: 0 },
-            2: { x: 500, y: 200, score: 0, levelsWon: 0 }
+            1: { x: 100, y: 200, score: 0, levelsWon: 0, movementSequence: 0 },
+            2: { x: 450, y: 250, score: 0, levelsWon: 0, movementSequence: 0 }
           },
           obstacles: createLevelObstacles(1),
           coins: Array.from({ length: 6 }, spawnCoin)
@@ -461,14 +509,16 @@ if (data.type === "restart_game" || data.type === "next_level") {
     x: 100,
     y: 200,
     score: 0,
-    levelsWon: room.game.players[1].levelsWon
+    levelsWon: room.game.players[1].levelsWon,
+    movementSequence: 0
   };
 
   room.game.players[2] = {
-    x: 500,
-    y: 200,
+    x: 450,
+    y: 250,
     score: 0,
-    levelsWon: room.game.players[2].levelsWon
+    levelsWon: room.game.players[2].levelsWon,
+    movementSequence: 0
   };
 
   room.game.obstacles = createLevelObstacles(room.game.level);
@@ -521,23 +571,12 @@ if (data.type === "player_move") {
 
 const currentPlayer = room.game.players[playerNumber];
 
-const nextX = Math.max(15, Math.min(785, move.x));
-const nextY = Math.max(15, Math.min(485, move.y));
-
-// Check whether the requested position hits an obstacle.
-const blocked = (x, y) =>
-  room.game.obstacles?.some(obstacle =>
-    serverCircleTouchesObstacle(x, y, 15, obstacle)
-  ) ?? false;
-
-// Allow movement if the destination does not hit an obstacle.
-if (!blocked(nextX, nextY)) {
-  currentPlayer.x = nextX;
-  currentPlayer.y = nextY;
-}
-
-
-
+currentPlayer.x = Math.max(15, Math.min(785, move.x));
+currentPlayer.y = Math.max(15, Math.min(485, move.y));
+currentPlayer.movementSequence = Number.isSafeInteger(data.sequence)
+  ? data.sequence
+  : currentPlayer.movementSequence + 1;
+pushPlayerOut(currentPlayer, room.game.obstacles || []);
 
 for (let i = room.game.coins.length - 1; i >= 0; i--) {
   const coin = room.game.coins[i];
@@ -558,9 +597,6 @@ for (let i = room.game.coins.length - 1; i >= 0; i--) {
   }
 }
 
-if (room.game.gameOver) {
-  broadcast(room, { type: "game_state", game: room.game });
-}
 return;
 }
     if (data.type === "ping") {
@@ -604,7 +640,6 @@ setInterval(() => {
       const scoreOne = room.game.players[1].score;
       const scoreTwo = room.game.players[2].score;
       finishLevel(room, scoreOne === scoreTwo ? null : scoreOne > scoreTwo ? 1 : 2);
-      broadcast(room, { type: "game_state", game: room.game });
       continue;
     }
 
@@ -652,6 +687,7 @@ function finishLevel(room, winner) {
     room.game.matchWinner = winsOne === winsTwo ? null : winsOne > winsTwo ? 1 : 2;
   }
 
+  broadcast(room, { type: "game_state", game: room.game });
 }
 
 server.listen(PORT, "0.0.0.0", () => {
