@@ -1,6 +1,6 @@
 /* =========================================================
    DUO ARENA
-   Solo game logic, visuals, sound and five levels
+   Solo game logic, visuals, sound and ten levels
    ========================================================= */
 
 "use strict";
@@ -924,8 +924,10 @@ if (musicToggleButton) {
 // ---------------------------------------------------------
 
 function updateScoreDisplays() {
+  const targetScore = getLevelDetails(currentLevel).coinCount || TARGET_SCORE;
+
   if (arenaScoreDisplay) {
-    arenaScoreDisplay.textContent = `${score}/10`;
+    arenaScoreDisplay.textContent = `${score}/${targetScore}`;
   }
 
   if (arenaCoinsDisplay) {
@@ -935,7 +937,7 @@ function updateScoreDisplays() {
 
 function updateLevelDisplay() {
   if (levelDisplay) {
-    levelDisplay.textContent = String(currentLevel);
+    levelDisplay.textContent = `${currentLevel} / 10`;
   }
 }
 
@@ -966,7 +968,7 @@ function startPracticeTimer() {
 // ---------------------------------------------------------
 
 function resetGame(level = currentLevel) {
-  currentLevel = Math.max(1, Math.min(5, Math.floor(Number(level) || 1)));
+  currentLevel = Math.max(1, Math.min(10, Math.floor(Number(level) || 1)));
   score = 0;
   collected = 0;
   remainingTime = getLevelDetails(currentLevel).duration;
@@ -991,7 +993,8 @@ function resetGame(level = currentLevel) {
 
   obstacles = buildLevelObstacles(currentLevel);
 
-  for (let i = 0; i < 10; i++) {
+  const coinCount = getLevelDetails(currentLevel).coinCount || TARGET_SCORE;
+  for (let i = 0; i < coinCount; i++) {
     coins.push(spawnCoin());
   }
 
@@ -1001,7 +1004,7 @@ function resetGame(level = currentLevel) {
   startPracticeTimer();
   if (gameStatus) {
     gameStatus.textContent =
-      `Level ${currentLevel}: ${getLevelDetails(currentLevel).name} — collect 10 coins!`;
+      `Level ${currentLevel}: ${getLevelDetails(currentLevel).name} — collect ${coinCount} coins!`;
   }
 
   hideMessage();
@@ -1092,7 +1095,7 @@ function collectPracticeCoins() {
 
       updateScoreDisplays();
 
-      if (score >= 10) {
+      if (score >= (getLevelDetails(currentLevel).coinCount || TARGET_SCORE)) {
         finishPracticeGame(true);
         return;
       }
@@ -1117,8 +1120,8 @@ function finishPracticeGame(won) {
   if (won) {
     playWinSound();
     practiceLevelWon = true;
-    if (currentLevel === 5) {
-      showMessage("YOU BEAT THE GAME", "You cleared all five arenas!");
+    if (currentLevel === 10) {
+      showMessage("YOU BEAT THE GAME", "You cleared all ten arenas!");
       if (playAgainBtn) playAgainBtn.textContent = "Play Again";
     } else {
       showMessage(
@@ -1131,7 +1134,7 @@ function finishPracticeGame(won) {
     playLoseSound();
     showMessage(
       "GAME OVER",
-      "Good try! Play again to collect 10 coins."
+      `Good try! Play again to collect ${getLevelDetails(currentLevel).coinCount || TARGET_SCORE} coins.`
     );
   }
 
@@ -1274,7 +1277,7 @@ if (playAgainBtn) {
     hideMessage();
     resetGame(
       practiceLevelWon
-        ? (currentLevel === 5 ? 1 : currentLevel + 1)
+        ? (currentLevel === 10 ? 1 : currentLevel + 1)
         : currentLevel
     );
     startBackgroundMusic();
