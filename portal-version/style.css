@@ -1,0 +1,1209 @@
+
+/* =========================================================
+   DUO ARENA — CLEAN STYLESHEET
+   Fantasy energy world / responsive interface
+   ========================================================= */
+
+/* ---------- GLOBAL RESET ---------- */
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  color-scheme: light;
+  --cyan: #4d963c;
+  --purple: #789f45;
+  --pink: #d58c40;
+  --background: #92dbff;
+  --panel: rgba(249, 246, 220, 0.94);
+  --text: #263b28;
+  --muted: #485d3c;
+}
+
+html {
+  min-height: 100%;
+  background: var(--background);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background:
+    linear-gradient(180deg, #69c5fa 0%, #d1f0ff 54%, #87c653 55%, #4b9d3d 100%);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  padding: 10px 16px;
+  border: 1px solid #3b7635;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #8bcf57, #4d983c);
+  color: #183b25;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #377137, 0 5px 12px rgba(45, 87, 38, 0.2);
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  border-color: #2c642f;
+  background: linear-gradient(135deg, #a1dc64, #68ad44);
+  box-shadow: 0 5px 0 #377137, 0 8px 16px rgba(45, 87, 38, 0.24);
+}
+
+button:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #377137;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+}
+
+input {
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid #8b9e65;
+  border-radius: 8px;
+  background: #fffdf0;
+  color: #263b28;
+}
+
+input::placeholder {
+  color: #73815b;
+}
+
+p {
+  line-height: 1.5;
+}
+
+/* ---------- MAIN GAME CONTAINER ---------- */
+
+.game-container {
+  position: relative;
+  width: min(1180px, 96%);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 24px 18px 40px;
+}
+
+/* ---------- START SCREEN ---------- */
+
+#startScreen {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 18%, rgba(255, 248, 194, 0.94), transparent 22%),
+    linear-gradient(180deg, #4bb7f2 0%, #9cdefd 45%, #d7f4ff 62%, #83c653 62.2%, #438b37 100%);
+}
+
+#startScreen::before,
+#startScreen::after {
+  position: absolute;
+  z-index: 0;
+  content: "";
+  pointer-events: none;
+}
+
+#startScreen::before {
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 78% 15%, rgba(255, 246, 194, 0.76), transparent 15%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 50%);
+}
+
+#startScreen::after {
+  width: min(66vw, 720px);
+  height: min(66vw, 720px);
+  border-radius: 50%;
+  box-shadow:
+    0 0 100px rgba(255, 248, 194, 0.22),
+    0 0 190px rgba(66, 184, 240, 0.16);
+  animation: ringPulse 5s ease-in-out infinite;
+}
+
+.cinematic-scene {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  overflow: hidden;
+  perspective: 800px;
+  pointer-events: none;
+}
+
+.scenic-hills {
+  position: absolute;
+  right: -8%;
+  bottom: 25%;
+  left: -8%;
+  height: 30%;
+  background:
+    radial-gradient(ellipse 38% 100% at 14% 100%, #7ab750 99%, transparent 100%),
+    radial-gradient(ellipse 42% 100% at 52% 100%, #80bd50 99%, transparent 100%),
+    radial-gradient(ellipse 40% 100% at 88% 100%, #6eaa49 99%, transparent 100%);
+}
+
+.scenic-ground {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 27%;
+  background:
+    repeating-linear-gradient(168deg, transparent 0 19px, rgba(203, 245, 139, 0.22) 20px 22px, transparent 23px 38px),
+    linear-gradient(180deg, #91d452 0%, #60b641 18%, #37933b 100%);
+  box-shadow: 0 -10px 28px rgba(69, 144, 57, 0.14);
+}
+
+.scenic-cloud {
+  position: absolute;
+  width: 140px;
+  height: 38px;
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.64);
+  filter: drop-shadow(0 8px 10px rgba(60, 136, 182, 0.12));
+  animation: cloudDrift 34s ease-in-out infinite alternate;
+}
+
+.scenic-cloud::before,
+.scenic-cloud::after {
+  position: absolute;
+  bottom: 8px;
+  content: "";
+  border-radius: 50%;
+  background: inherit;
+}
+
+.scenic-cloud::before {
+  left: 22px;
+  width: 56px;
+  height: 56px;
+}
+
+.scenic-cloud::after {
+  right: 20px;
+  width: 42px;
+  height: 42px;
+}
+
+.scenic-cloud-one {
+  top: 18%;
+  left: 11%;
+}
+
+.scenic-cloud-two {
+  top: 28%;
+  right: 13%;
+  transform: scale(0.72);
+  animation-delay: -11s;
+}
+
+.scenic-cloud-three {
+  top: 9%;
+  left: 67%;
+  transform: scale(0.55);
+  animation-delay: -22s;
+}
+
+.light-flare {
+  position: absolute;
+  left: -25%;
+  width: 150%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), #fff8c2, rgba(255, 220, 120, 0.8), transparent);
+  box-shadow: 0 0 18px 3px rgba(255, 245, 189, 0.48);
+  opacity: 0;
+  transform: rotate(-23deg) translateX(-18%);
+  animation: flareSweep 7.5s ease-in-out infinite;
+}
+
+.light-flare-one {
+  top: 18%;
+  animation-delay: -1.5s;
+}
+
+.light-flare-two {
+  top: 78%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), #fff8c2, transparent);
+  box-shadow: 0 0 18px 3px rgba(255, 245, 189, 0.38);
+  animation-delay: -4.2s;
+}
+
+.light-flare-three {
+  top: 51%;
+  height: 1px;
+  animation-delay: -6s;
+}
+
+.coin {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: var(--coin-size, 34px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 240, 169, 0.96);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 25%, #fff8c9 0 5%, transparent 30%),
+    linear-gradient(135deg, #fff0a0, #edae37 46%, #9b5015 100%);
+  box-shadow:
+    inset 0 0 0 3px rgba(120, 64, 18, 0.32),
+    inset 0 0 0 5px rgba(255, 237, 161, 0.68),
+    0 0 12px 2px rgba(255, 191, 70, 0.46);
+  opacity: 0.82;
+  animation: coinDrift var(--coin-duration, 6s) ease-in-out var(--coin-delay, 0s) infinite;
+}
+
+.coin::after {
+  content: "✦";
+  color: rgba(120, 64, 18, 0.8);
+  font-size: calc(var(--coin-size, 34px) * 0.42);
+  text-shadow: 0 1px 0 rgba(255, 247, 187, 0.7);
+}
+
+.coin-one {
+  top: 17%;
+  left: 12%;
+  --coin-size: 32px;
+  --coin-delay: -2s;
+  --drift-x: 16px;
+  --drift-y: -18px;
+}
+
+.coin-two {
+  top: 31%;
+  right: 10%;
+  --coin-size: 46px;
+  --coin-delay: -4s;
+  --coin-duration: 8s;
+  --drift-x: -18px;
+  --drift-y: -25px;
+}
+
+.coin-three {
+  top: 74%;
+  left: 8%;
+  --coin-size: 40px;
+  --coin-delay: -1s;
+  --coin-duration: 7s;
+  --drift-x: 12px;
+  --drift-y: 18px;
+}
+
+.coin-four {
+  right: 19%;
+  bottom: 13%;
+  --coin-size: 28px;
+  --coin-delay: -5s;
+  --coin-duration: 5s;
+  --drift-x: -14px;
+  --drift-y: -20px;
+}
+
+.coin-five {
+  top: 9%;
+  right: 32%;
+  --coin-size: 24px;
+  --coin-delay: -3s;
+  --coin-duration: 8s;
+  --drift-x: 10px;
+  --drift-y: 22px;
+}
+
+.coin-six {
+  top: 56%;
+  left: 19%;
+  --coin-size: 22px;
+  --coin-delay: -6s;
+  --coin-duration: 7s;
+  --drift-x: -12px;
+  --drift-y: -14px;
+}
+
+.coin-seven {
+  top: 15%;
+  right: 8%;
+  --coin-size: 28px;
+  --coin-delay: -4s;
+  --coin-duration: 5s;
+  --drift-x: 15px;
+  --drift-y: 14px;
+}
+
+.coin-eight {
+  right: 7%;
+  bottom: 23%;
+  --coin-size: 36px;
+  --coin-delay: -2s;
+  --coin-duration: 9s;
+  --drift-x: -20px;
+  --drift-y: -18px;
+}
+
+.coin-nine {
+  bottom: 9%;
+  left: 31%;
+  --coin-size: 26px;
+  --coin-delay: -5s;
+  --coin-duration: 6s;
+  --drift-x: 18px;
+  --drift-y: -12px;
+}
+
+.coin-ten {
+  top: 40%;
+  left: 5%;
+  --coin-size: 25px;
+  --coin-delay: -3s;
+  --coin-duration: 8s;
+  --drift-x: -14px;
+  --drift-y: 18px;
+}
+
+.coin-eleven {
+  top: 84%;
+  right: 37%;
+  --coin-size: 20px;
+  --coin-delay: -1s;
+  --coin-duration: 7s;
+  --drift-x: 10px;
+  --drift-y: -17px;
+}
+
+.coin-twelve {
+  top: 62%;
+  right: 5%;
+  --coin-size: 23px;
+  --coin-delay: -6s;
+  --coin-duration: 6s;
+  --drift-x: -12px;
+  --drift-y: -15px;
+}
+
+.start-content {
+  position: relative;
+  z-index: 2;
+  width: min(900px, 100%);
+  text-align: center;
+  text-shadow: 0 1px 5px rgba(24, 70, 46, 0.72);
+  animation: contentArrival 1s 0.15s both cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.start-kicker,
+.start-footnote {
+  color: #294b2e;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.28em;
+}
+
+.start-kicker {
+  margin: 0 0 18px;
+}
+
+.start-footnote {
+  margin: 28px 0 0;
+  color: #365637;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+}
+
+.start-footnote span {
+  padding: 0 7px;
+  color: var(--pink);
+}
+
+#startTitle {
+  margin: 0;
+  white-space: nowrap;
+  font-size: clamp(34px, 9vw, 86px);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 1.1;
+  color: #ffffff;
+  text-shadow:
+    0 2px 0 rgba(36, 91, 56, 0.75),
+    0 0 12px rgba(255, 255, 255, 0.92),
+    0 0 42px rgba(255, 238, 147, 0.76);
+}
+
+.start-tagline {
+  margin: 18px 0 32px;
+  color: #29462f;
+  font-size: clamp(14px, 2.5vw, 18px);
+  letter-spacing: 0.025em;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.68);
+}
+
+#startPracticeBtn {
+  border-color: #3b7635;
+  background: linear-gradient(110deg, #a1dc64, #65ad44 72%, #468a3a);
+  color: #183b25;
+  box-shadow: 0 4px 0 #377137, 0 8px 20px rgba(45, 87, 38, 0.25);
+}
+
+.button-arrow {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 20px;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+
+/* ---------- HEADER ---------- */
+
+.game-header {
+  margin: 0 0 22px;
+  text-align: center;
+}
+
+.game-header h1 {
+  margin: 0;
+  font-size: clamp(30px, 5vw, 48px);
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-shadow: 0 0 18px rgba(66, 234, 255, 0.32);
+}
+
+.subtitle {
+  margin: 8px 0 0;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+
+/* ---------- SCOREBOARD ---------- */
+
+.scoreboard {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin: 20px 0;
+  padding: 12px 16px;
+  border: 1px solid rgba(183, 108, 255, 0.25);
+  border-radius: 12px;
+  background: rgba(12, 15, 35, 0.85);
+}
+
+.scoreboard p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.scoreboard span {
+  color: white;
+  font-weight: 800;
+}
+
+/* ---------- ARENA ---------- */
+
+.arena-container {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  overflow: hidden;
+  border: 2px solid rgba(66, 234, 255, 0.9);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #bceaff 0 62%, #70bd43 62% 100%);
+  box-shadow:
+    0 0 14px rgba(66, 234, 255, 0.25),
+    0 0 36px rgba(116, 61, 211, 0.2);
+}
+
+#arena {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 8 / 5;
+  background: linear-gradient(180deg, #bceaff 0 62%, #70bd43 62% 100%);
+}
+
+.game-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  margin: 12px 0;
+}
+
+.game-stats p {
+  margin: 0;
+  color: #e9f8ff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ---------- GAME STATUS ---------- */
+
+#gameStatus {
+  min-height: 26px;
+  margin: 16px 0;
+  color: #c7d6ff;
+  text-align: center;
+}
+
+/* ---------- GAME CONTROLS ---------- */
+
+.game-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 16px auto;
+}
+
+/* ---------- WIN / LOSE MESSAGE ---------- */
+
+#message {
+  position: fixed;
+  z-index: 900;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(3, 5, 17, 0.78);
+  backdrop-filter: blur(8px);
+}
+
+.message-card {
+  width: min(420px, 100%);
+  padding: 30px 24px;
+  border: 1px solid rgba(66, 234, 255, 0.65);
+  border-radius: 20px;
+  background:
+    radial-gradient(ellipse at top, rgba(60, 55, 126, 0.5), transparent 75%),
+    #0d1229;
+  box-shadow:
+    0 0 28px rgba(66, 234, 255, 0.15),
+    0 0 60px rgba(183, 108, 255, 0.13);
+  text-align: center;
+}
+
+.message-card h2 {
+  margin: 0 0 14px;
+  font-size: clamp(28px, 7vw, 42px);
+  letter-spacing: 0.06em;
+  color: white;
+  text-shadow: 0 0 16px rgba(66, 234, 255, 0.5);
+}
+
+.message-card p {
+  margin: 0 0 22px;
+  color: #cbd6f7;
+}
+
+/* ---------- INSTRUCTIONS ---------- */
+
+.instructions {
+  max-width: 800px;
+  margin: 26px auto 0;
+  padding: 18px;
+  border: 1px solid rgba(183, 108, 255, 0.22);
+  border-radius: 14px;
+  background: rgba(12, 15, 35, 0.75);
+}
+
+.instructions h2 {
+  margin-top: 0;
+  color: var(--purple);
+  font-size: 18px;
+}
+
+.instructions p {
+  margin: 8px 0;
+  color: var(--muted);
+}
+
+/* ---------- PRACTICE FULLSCREEN MODE ---------- */
+
+body.practice-mode {
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+body.practice-mode .game-container {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+body.practice-mode .arena-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+body.practice-mode #arena {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  aspect-ratio: auto;
+}
+
+body.practice-mode .game-stats {
+  top: 18px;
+  right: 18px;
+}
+
+body.practice-mode #gameStatus {
+  position: absolute;
+  z-index: 10;
+  top: 10px;
+  left: 50%;
+  width: min(60%, 500px);
+  min-height: 0;
+  margin: 0;
+  transform: translateX(-50%);
+  text-shadow: 0 1px 8px #000;
+}
+
+body.practice-mode .game-controls {
+  position: absolute;
+  z-index: 15;
+  bottom: 18px;
+  left: 50%;
+  margin: 0;
+  transform: translateX(-50%);
+}
+
+/* Keep the message visible above fullscreen practice mode. */
+body.practice-mode #message {
+  z-index: 900;
+}
+
+/* ---------- ANIMATIONS ---------- */
+
+@keyframes ringPulse {
+  0%,
+  100% {
+    transform: scale(0.95);
+    opacity: 0.45;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.85;
+  }
+}
+
+@keyframes flareSweep {
+  0% {
+    opacity: 0;
+    transform: rotate(-23deg) translateX(-35%);
+  }
+  10% {
+    opacity: 0.9;
+  }
+  24% {
+    opacity: 0;
+    transform: rotate(-23deg) translateX(35%);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(-23deg) translateX(35%);
+  }
+}
+
+@keyframes coinDrift {
+  0% {
+    transform: translate3d(0, 0, 0) rotateY(0deg) rotateZ(-8deg);
+    filter: brightness(0.85);
+  }
+  50% {
+    transform: translate3d(var(--drift-x, 12px), var(--drift-y, -22px), 0) rotateY(180deg) rotateZ(8deg);
+    opacity: 1;
+    filter: brightness(1.2);
+  }
+  100% {
+    transform: translate3d(-8px, 8px, 0) rotateY(360deg) rotateZ(-5deg);
+    filter: brightness(0.9);
+  }
+}
+
+@keyframes contentArrival {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ---------- RESPONSIVE LAYOUT ---------- */
+
+@media (max-width: 640px) {
+  .start-kicker {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+  }
+
+  .start-footnote {
+    font-size: 8px;
+  }
+
+  .scenic-cloud {
+    transform: scale(0.7);
+  }
+
+  .coin {
+    --coin-size: 22px !important;
+  }
+
+  .coin-two,
+  .coin-three,
+  .coin-eight,
+  .coin-ten {
+    display: none;
+  }
+
+  .game-container {
+    width: 100%;
+    padding: 16px 10px 28px;
+  }
+
+  .scoreboard {
+    gap: 8px 14px;
+    padding: 10px;
+  }
+
+  .scoreboard p {
+    font-size: 12px;
+  }
+
+  .game-stats {
+    top: 6px;
+    right: 6px;
+    padding: 5px 7px;
+  }
+
+  .game-stats p {
+    font-size: 10px;
+  }
+
+  body.practice-mode .game-controls {
+    bottom: 12px;
+  }
+
+  body.practice-mode .game-controls button {
+    padding: 9px 12px;
+  }
+
+  body.practice-mode #gameStatus {
+    top: 8px;
+    width: 55%;
+    font-size: 12px;
+  }
+}
+
+/* ---------- REDUCED MOTION ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  #startScreen::before,
+  #startScreen::after,
+  .start-content,
+  .light-flare,
+  .coin {
+    animation: none !important;
+  }
+
+  .start-content {
+    opacity: 1;
+    transform: none;
+  }
+
+  .light-flare {
+    opacity: 0;
+  }
+
+  .coin {
+    opacity: 0.8;
+    transform: none;
+  }
+}
+
+/* DUOARENA — Animated Neon Arena Border */
+.arena-container {
+  position: relative;
+  isolation: isolate;
+  border: 2px solid transparent;
+  border-radius: 18px;
+  background:
+    linear-gradient(#bceaff 0 62%, #70bd43 62% 100%) padding-box,
+    linear-gradient(
+      135deg,
+      #00f5ff,
+      #7b2cff,
+      #ff38c8,
+      #00f5ff
+    ) border-box;
+  box-shadow:
+    0 0 10px rgba(0, 245, 255, 0.55),
+    0 0 25px rgba(123, 44, 255, 0.3),
+    inset 0 0 12px rgba(0, 245, 255, 0.12);
+  animation: arenaGlow 4s ease-in-out infinite alternate;
+}
+
+/* Keep the arena and its contents inside rounded corners */
+.arena-container canvas {
+  display: block;
+  max-width: 100%;
+  border-radius: 14px;
+}
+
+/* Slowly breathing neon glow */
+@keyframes arenaGlow {
+  0% {
+    box-shadow:
+      0 0 8px rgba(0, 245, 255, 0.4),
+      0 0 18px rgba(123, 44, 255, 0.2),
+      inset 0 0 8px rgba(0, 245, 255, 0.08);
+  }
+
+  100% {
+    box-shadow:
+      0 0 16px rgba(0, 245, 255, 0.8),
+      0 0 32px rgba(255, 56, 200, 0.35),
+      inset 0 0 14px rgba(0, 245, 255, 0.18);
+  }
+}
+
+/* VISIBLE GLOWING BORDER — PRACTICE ARENA */
+#arena {
+  box-sizing: border-box;
+  border: 3px solid #00f5ff !important;
+  border-radius: 14px;
+  box-shadow:
+    0 0 8px #00f5ff,
+    0 0 18px #7b2cff,
+    inset 0 0 12px rgba(0, 245, 255, 0.18);
+  animation: arenaBorderPulse 3s ease-in-out infinite alternate;
+}
+
+@keyframes arenaBorderPulse {
+  from {
+    border-color: #00f5ff;
+    box-shadow: 0 0 8px #00f5ff, 0 0 16px #7b2cff;
+  }
+  to {
+    border-color: #ff38c8;
+    box-shadow: 0 0 12px #ff38c8, 0 0 28px #00f5ff;
+  }
+}
+/* VICTORY EFFECT — MESSAGE BOX ONLY */
+#message.victory-effect .message-card {
+  border: 2px solid #ffd700;
+  border-radius: 16px;
+  box-shadow: 0 0 12px #ffd700, 0 0 25px #ff8c00;
+  animation: victoryPulse 0.8s ease-in-out infinite alternate;
+}
+
+#message.victory-effect #message-title {
+  color: #ffd700;
+  text-shadow: 0 0 12px #ff8c00, 0 0 25px #ffd700;
+}
+
+@keyframes victoryPulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.035); }
+}
+
+@keyframes victoryTitle {
+  from { text-shadow: 0 0 10px #ffd700; }
+  to { text-shadow: 0 0 25px #ff8c00, 0 0 35px #ffd700; }
+}
+
+/* CINEMATIC DEFEAT EFFECT */
+#messageOverlay.defeat-effect {
+  border: 2px solid #75809b;
+  box-shadow: 0 0 22px rgba(100, 120, 160, 0.7);
+}
+
+#messageOverlay.defeat-effect #messageTitle {
+  color: #aab4cc;
+  text-shadow: 0 0 12px #64748b;
+}
+/* DUOARENA FUTURISTIC SCOREBOARD */
+.game-stats {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px;
+  margin: 12px auto;
+}
+
+.game-stats p {
+  flex: 1 1 150px;
+  max-width: 240px;
+  margin: 0;
+  padding: 14px 18px;
+  text-align: center;
+  color: #eafaff;
+  font-size: 14px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #101b38, #17102e);
+  border: 1px solid rgba(0, 245, 255, 0.65);
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 245, 255, 0.12),
+    inset 0 0 12px rgba(0, 245, 255, 0.06);
+    }
+
+/* Meadow palette overrides for game controls and info panels. */
+.game-header h1 {
+  color: #294b2e;
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.55);
+}
+
+.scoreboard span {
+  color: #274c2d;
+}
+
+.instructions h2 {
+  color: #355f35;
+}
+
+.game-stats p {
+  color: #29432e;
+  background: linear-gradient(145deg, rgba(255, 254, 238, 0.97), rgba(231, 241, 194, 0.96));
+  border-color: rgba(78, 120, 55, 0.6);
+  box-shadow: 0 3px 10px rgba(48, 82, 39, 0.12);
+}
+
+.game-controls button {
+  border-color: #477a39;
+  color: #193b25;
+  background: linear-gradient(135deg, #a0d65c, #5b9f40);
+}
+
+.game-controls button[aria-pressed="false"] {
+  border-color: #9a6a30;
+  background: linear-gradient(135deg, #f4d47a, #d7a648);
+}
+
+.arena-container {
+  border-color: #588348;
+  box-shadow: 0 8px 24px rgba(47, 77, 36, 0.24);
+  animation: none;
+}
+
+#arena {
+  border-color: #507d3b !important;
+  box-shadow: 0 0 0 2px rgba(238, 244, 195, 0.52), inset 0 0 12px rgba(46, 89, 43, 0.12);
+  animation: none;
+}
+
+#startPracticeBtn:hover {
+  background: linear-gradient(110deg, #b2e873, #79bd4d 72%, #589c3c);
+}
+
+.message-card {
+  border-color: #799b55;
+  background: linear-gradient(155deg, #fffde9, #dcebc3);
+  box-shadow: 0 18px 55px rgba(42, 67, 33, 0.28);
+}
+
+.message-card h2 {
+  color: #2c5734;
+  text-shadow: none;
+}
+
+.message-card p {
+  color: #40563a;
+}
+
+.game-stats p {
+  text-shadow: none;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body.practice-mode .game-container {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body.practice-mode #startScreen,
+body.practice-mode .game-header,
+body.practice-mode .instructions {
+  display: none !important;
+}
+
+body.practice-mode .arena-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  margin: 0;
+  overflow: hidden;
+}
+
+body.practice-mode #arena {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-width: none;
+  aspect-ratio: auto;
+}
+
+body.practice-mode .game-stats {
+  position: absolute;
+  z-index: 10;
+  top: 12px;
+  right: 12px;
+  left: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+}
+
+body.practice-mode .game-stats p {
+  min-width: 0;
+  padding: clamp(4px, 1vw, 10px);
+  font-size: clamp(9px, 1.5vw, 14px);
+  overflow-wrap: anywhere;
+}
+
+body.practice-mode #gameStatus {
+  top: clamp(60px, 11vh, 88px);
+  width: min(70%, 500px);
+  font-size: clamp(10px, 1.8vw, 16px);
+}
+
+body.practice-mode .game-controls {
+  bottom: 12px;
+  gap: 8px;
+}
+
+body.practice-mode .game-controls button {
+  padding: clamp(6px, 1.5vh, 10px) clamp(8px, 2vw, 16px);
+  font-size: clamp(10px, 1.6vw, 15px);
+}
+
+@media (max-width: 420px) {
+  body.practice-mode .game-stats {
+    top: 6px;
+    right: 6px;
+    left: 6px;
+    gap: 4px;
+  }
+
+  body.practice-mode #gameStatus {
+    top: 58px;
+    width: 90%;
+  }
+}
+
+@media (max-height: 520px) {
+  .start-content {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  #startScreen {
+    padding: 8px;
+  }
+
+  .start-kicker {
+    margin-bottom: 6px;
+    font-size: clamp(7px, 2vh, 11px);
+    letter-spacing: 0.12em;
+  }
+
+  #startTitle {
+    font-size: clamp(20px, 10vh, 64px);
+    line-height: 1;
+  }
+
+  .start-tagline {
+    margin: clamp(4px, 1.5vh, 12px) 0;
+    font-size: clamp(10px, 2.5vh, 16px);
+  }
+
+  #startPracticeBtn {
+    min-height: clamp(36px, 8vh, 52px);
+    margin: clamp(4px, 1.5vh, 12px) auto;
+    padding: 8px 16px;
+  }
+
+  .start-footnote {
+    margin-top: clamp(4px, 1.5vh, 12px);
+    font-size: clamp(7px, 1.5vh, 9px);
+  }
+}

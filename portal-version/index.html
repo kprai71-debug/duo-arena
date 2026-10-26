@@ -1,0 +1,106 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Duo Arena</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="game-container">
+
+    <!-- START SCREEN -->
+    <section id="startScreen" aria-labelledby="startTitle">
+      <div class="cinematic-scene" aria-hidden="true">
+        <span class="scenic-hills"></span>
+        <span class="scenic-ground"></span>
+        <span class="scenic-cloud scenic-cloud-one"></span>
+        <span class="scenic-cloud scenic-cloud-two"></span>
+        <span class="scenic-cloud scenic-cloud-three"></span>
+        <span class="light-flare light-flare-one"></span>
+        <span class="light-flare light-flare-two"></span>
+        <span class="light-flare light-flare-three"></span>
+        <span class="coin coin-one"></span>
+        <span class="coin coin-two"></span>
+        <span class="coin coin-three"></span>
+        <span class="coin coin-four"></span>
+        <span class="coin coin-five"></span>
+        <span class="coin coin-six"></span>
+        <span class="coin coin-seven"></span>
+        <span class="coin coin-eight"></span>
+        <span class="coin coin-nine"></span>
+        <span class="coin coin-ten"></span>
+        <span class="coin coin-eleven"></span>
+        <span class="coin coin-twelve"></span>
+      </div>
+      <div class="start-content">
+        <p class="start-kicker">THE ULTIMATE CO-OP SHOWDOWN</p>
+        <h1 id="startTitle">DUO ARENA</h1>
+        <p class="start-tagline">Two rivals. One arena. Make your legend.</p>
+
+        <button id="startPracticeBtn" type="button">
+          <span>PLAY NOW</span>
+          <span class="button-arrow" aria-hidden="true">↗</span>
+        </button>
+
+        <p class="start-footnote">ENTER THE ARENA <span aria-hidden="true">◆</span> CLAIM THE CROWN</p>
+      </div>
+    </section>
+
+    <!-- GAME HEADER -->
+    <header class="game-header">
+      <h1>DUO ARENA</h1>
+      <p class="subtitle">Enter the energy world</p>
+    </header>
+
+    <!-- GAME ARENA -->
+    <section class="arena-container" aria-label="Game arena">
+      <div class="game-stats">
+        <p>Level: <span id="levelDisplay">1</span></p>
+        <p>Time: <span id="timerDisplay">60</span></p>
+        <p>Score: <span id="arenaScore">0/10</span></p>
+        <p>Coins: <span id="arenaCoins">0</span></p>
+      </div>
+      <canvas id="arena" width="800" height="500">
+        Your browser does not support the game canvas.
+      </canvas>
+
+    </section>
+
+    <!-- GAME MESSAGES -->
+    <section id="message" class="hidden" aria-live="polite">
+      <div class="message-card">
+        <h2 id="message-title">GAME OVER</h2>
+        <p id="message-text"></p>
+        <button id="play-again" type="button">Play Again</button>
+      </div>
+    </section>
+
+    <p id="gameStatus" aria-live="polite">
+      Press PLAY NOW to begin.
+    </p>
+
+    <div class="game-controls">
+      <button id="homeBtn" type="button" hidden>Home</button>
+      <button id="restart" type="button">Restart</button>
+      <button id="musicToggle" type="button" aria-pressed="true">
+        Music: ON
+      </button>
+    </div>
+
+    <!-- INSTRUCTIONS -->
+    <section class="instructions">
+      <h2>How to Play</h2>
+      <p>Use the arrow keys or W, A, S, D to move.</p>
+      <p>Collect coins to increase your score.</p>
+      <p>Win a level and choose Next Level to face more and faster obstacles. Use Restart to return to Level 1.</p>
+      <p>Press M to toggle music.</p>
+    </section>
+
+  </main>
+
+  <script src="levels.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

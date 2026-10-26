@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
   <title>Duo Arena</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -158,6 +158,14 @@
     </section>
 
   </main>
+
+  <div id="touchControls" aria-hidden="true">
+    <div id="joystick" role="application" aria-label="Movement joystick">
+      <span class="joystick-ring"></span>
+      <span id="joystickStick"></span>
+    </div>
+  </div>
+  <div id="rotateMessage" role="status">Rotate your phone</div>
 
   <script src="levels.js"></script>
   <script src="game.js"></script>

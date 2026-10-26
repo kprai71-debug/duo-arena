@@ -1415,3 +1415,225 @@ color: #b8c8e8;
   text-shadow: 0 2px 0 #385f30, 0 0 20px rgba(255, 242, 170, 0.8);
   background: rgba(40, 75, 36, 0.2);
 }
+
+#touchControls,
+#rotateMessage {
+  display: none;
+}
+
+html.touch-device,
+html.touch-device body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body.touch-device {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: var(--touch-viewport-height, 100vh);
+  min-height: 0;
+}
+
+body.touch-device #musicToggle {
+  position: fixed;
+  z-index: 1001;
+  top: max(8px, env(safe-area-inset-top));
+  right: max(8px, env(safe-area-inset-right));
+  padding: 7px 10px;
+  font-size: 11px;
+}
+
+body.touch-device.practice-mode,
+body.touch-device.multiplayer-active {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body.touch-device.practice-mode .game-container,
+body.touch-device.multiplayer-active .game-container {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: var(--touch-viewport-height, 100vh);
+  min-height: 0;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body.touch-device.practice-mode .arena-container,
+body.touch-device.multiplayer-active .arena-container {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  margin: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: linear-gradient(180deg, #69c5fa 0%, #d1f0ff 54%, #87c653 55%, #4b9d3d 100%);
+}
+
+body.touch-device.practice-mode #arena,
+body.touch-device.multiplayer-active #arena {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--touch-game-width, min(100vw, 160vh));
+  height: var(--touch-game-height, min(100vh, 62.5vw));
+  max-width: none;
+  max-height: none;
+  min-height: 0;
+  aspect-ratio: 8 / 5;
+  transform: translate(-50%, -50%);
+}
+
+body.touch-device.practice-mode .game-stats,
+body.touch-device.multiplayer-active .game-stats {
+  position: absolute;
+  z-index: 20;
+  top: max(6px, env(safe-area-inset-top));
+  right: max(8px, env(safe-area-inset-right));
+  left: max(8px, env(safe-area-inset-left));
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  width: auto;
+  padding: 0;
+  margin: 0;
+  pointer-events: none;
+}
+
+body.touch-device.practice-mode .game-stats p,
+body.touch-device.multiplayer-active .game-stats p {
+  min-width: 0;
+  max-width: none;
+  padding: 4px 6px;
+  font-size: clamp(9px, 2.4vh, 12px);
+  overflow-wrap: anywhere;
+}
+
+body.touch-device.practice-mode #gameStatus,
+body.touch-device.multiplayer-active #gameStatus {
+  position: absolute;
+  z-index: 20;
+  top: clamp(56px, 18vh, 76px);
+  left: 50%;
+  width: min(70%, 500px);
+  min-height: 0;
+  margin: 0;
+  font-size: clamp(9px, 2.4vh, 12px);
+  transform: translateX(-50%);
+  text-shadow: 0 1px 8px #000;
+  pointer-events: none;
+}
+
+body.touch-device.practice-mode .game-controls,
+body.touch-device.multiplayer-active .game-controls {
+  position: fixed;
+  z-index: 30;
+  bottom: max(10px, env(safe-area-inset-bottom));
+  left: 50%;
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  transform: translateX(-50%);
+}
+
+body.touch-device.practice-mode .game-controls button,
+body.touch-device.multiplayer-active .game-controls button {
+  padding: 7px 10px;
+  font-size: 11px;
+  touch-action: none;
+}
+
+body.touch-device.practice-mode #musicToggle,
+body.touch-device.multiplayer-active #musicToggle {
+  position: fixed;
+  z-index: 35;
+  top: max(8px, env(safe-area-inset-top));
+  right: max(8px, env(safe-area-inset-right));
+  padding: 7px 10px;
+  font-size: 11px;
+}
+
+body.touch-device.practice-mode #touchControls,
+body.touch-device.multiplayer-active #touchControls {
+  position: fixed;
+  z-index: 31;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+body.touch-device.practice-mode #joystick,
+body.touch-device.multiplayer-active #joystick {
+  position: absolute;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  left: max(14px, env(safe-area-inset-left));
+  width: clamp(84px, 24vh, 132px);
+  aspect-ratio: 1;
+  border: 2px solid rgba(255, 255, 255, 0.68);
+  border-radius: 50%;
+  background: rgba(38, 67, 43, 0.32);
+  box-shadow: inset 0 0 16px rgba(255, 255, 255, 0.18), 0 4px 18px rgba(0, 0, 0, 0.22);
+  pointer-events: auto;
+  touch-action: none;
+}
+
+#joystick .joystick-ring {
+  position: absolute;
+  inset: 15%;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+#joystickStick {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 42%;
+  height: 42%;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  background: linear-gradient(145deg, rgba(241, 255, 220, 0.95), rgba(92, 151, 63, 0.94));
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+#rotateMessage {
+  position: fixed;
+  z-index: 2000;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  color: #fffbe2;
+  background: rgba(31, 56, 37, 0.96);
+  font-size: clamp(24px, 7vw, 40px);
+  font-weight: 800;
+  text-align: center;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.5);
+}
+
+@media (orientation: portrait) {
+  html.touch-device #rotateMessage {
+    display: flex;
+  }
+
+  body.touch-device #touchControls {
+    display: none !important;
+  }
+}

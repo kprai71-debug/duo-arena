@@ -105,6 +105,98 @@ const buildLevelObstacles = level => levelDetails.createLevelObstacles(level);
 const getLevelDetails = level => levelDetails.getLevelConfig(level);
 
 const keys = {};
+const isTouchDevice =
+  navigator.maxTouchPoints > 0 ||
+  window.matchMedia("(pointer: coarse)").matches;
+const joystick = document.getElementById("joystick");
+const joystickStick = document.getElementById("joystickStick");
+let joystickPointerId = null;
+
+if (isTouchDevice) {
+  document.documentElement.classList.add("touch-device");
+  document.body.classList.add("touch-device");
+}
+
+function updateTouchViewport() {
+  if (!isTouchDevice) return;
+
+  const scale = Math.min(
+    window.innerWidth / 800,
+    window.innerHeight / 500
+  );
+  document.documentElement.style.setProperty(
+    "--touch-viewport-height",
+    `${window.innerHeight}px`
+  );
+  document.documentElement.style.setProperty(
+    "--touch-game-width",
+    `${800 * scale}px`
+  );
+  document.documentElement.style.setProperty(
+    "--touch-game-height",
+    `${500 * scale}px`
+  );
+}
+
+updateTouchViewport();
+window.addEventListener("resize", updateTouchViewport);
+
+function clearJoystickKeys() {
+  keys.ArrowLeft = false;
+  keys.ArrowRight = false;
+  keys.ArrowUp = false;
+  keys.ArrowDown = false;
+}
+
+function moveJoystick(event) {
+  if (event.pointerId !== joystickPointerId || !joystick || !joystickStick) {
+    return;
+  }
+
+  const bounds = joystick.getBoundingClientRect();
+  const maxTravel = bounds.width * 0.28;
+  const offsetX = event.clientX - (bounds.left + bounds.width / 2);
+  const offsetY = event.clientY - (bounds.top + bounds.height / 2);
+  const distance = Math.hypot(offsetX, offsetY);
+  const scale = distance > maxTravel ? maxTravel / distance : 1;
+  const x = offsetX * scale;
+  const y = offsetY * scale;
+
+  joystickStick.style.left = `calc(50% + ${x}px)`;
+  joystickStick.style.top = `calc(50% + ${y}px)`;
+  keys.ArrowLeft = x < -maxTravel * 0.25;
+  keys.ArrowRight = x > maxTravel * 0.25;
+  keys.ArrowUp = y < -maxTravel * 0.25;
+  keys.ArrowDown = y > maxTravel * 0.25;
+}
+
+if (isTouchDevice && joystick) {
+  joystick.addEventListener("pointerdown", event => {
+    if (joystickPointerId !== null || event.button !== 0) return;
+
+    event.preventDefault();
+    joystickPointerId = event.pointerId;
+    joystick.setPointerCapture(event.pointerId);
+    moveJoystick(event);
+  });
+
+  joystick.addEventListener("pointermove", moveJoystick);
+
+  const releaseJoystick = event => {
+    if (event.pointerId !== joystickPointerId) return;
+
+    joystickPointerId = null;
+    clearJoystickKeys();
+    if (joystickStick) {
+      joystickStick.style.left = "50%";
+      joystickStick.style.top = "50%";
+    }
+  };
+
+  joystick.addEventListener("pointerup", releaseJoystick);
+  joystick.addEventListener("pointercancel", releaseJoystick);
+  joystick.addEventListener("lostpointercapture", releaseJoystick);
+}
 
 let player = {
   x: 400,
@@ -1006,6 +1098,13 @@ function startBackgroundMusic() {
   }, 210);
 }
 
+if (isTouchDevice) {
+  document.addEventListener("pointerdown", () => {
+    getAudioContext();
+    startBackgroundMusic();
+  }, { once: true, passive: true });
+}
+
 function stopBackgroundMusic() {
   if (musicTimer) {
     clearInterval(musicTimer);
@@ -1596,6 +1695,7 @@ function resetMultiplayerState() {
   gameOver = false;
   currentLevel = 1;
   updateLevelDisplay();
+  document.body.classList.remove("multiplayer-active");
 
   if (countdownTimer) {
     clearInterval(countdownTimer);
@@ -1970,6 +2070,10 @@ if (levelsWonDisplay && game.levelsWon) {
   gameOver = false;
   gameRunning = Boolean(game.started);
   multiplayerReady = Boolean(game.started);
+  document.body.classList.toggle(
+    "multiplayer-active",
+    Boolean(game.started)
+  );
 
   if (game.started) {
     if (gameStatus) {
@@ -2144,7 +2248,12 @@ function returnToHome() {
 
   resetMultiplayerState();
   practiceMode = false;
-  document.body.classList.remove("multiplayer-lobby", "practice-mode");
+  document.body.classList.remove(
+    "multiplayer-lobby",
+    "multiplayer-active",
+    "practice-mode"
+  );
+  clearJoystickKeys();
   if (startScreen) {
     startScreen.style.display = "";
   }
